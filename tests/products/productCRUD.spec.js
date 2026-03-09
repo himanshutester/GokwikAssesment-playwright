@@ -12,7 +12,8 @@ const { waitForProductCreate } = require('../../utils/apiHelper');
 
 test.describe('Product CRUD @smoke', () => {
   test('@smoke verify dashboard loads with saved session', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     await expect(page.getByRole('button', { name: 'qa.gokwik down' })).toBeVisible({ timeout: 60000 });
   });
 
@@ -20,7 +21,8 @@ test.describe('Product CRUD @smoke', () => {
     const dashboard = new DashboardPage(page);
     const products = new ProductsPage(page);
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
 
     await dashboard.switchMerchant(env.merchantId);

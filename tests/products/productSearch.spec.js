@@ -15,7 +15,8 @@ test.describe('Product Search @regression', () => {
 
     const product = createProductData('Search');
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
 
     await dashboard.switchMerchant(env.merchantId);

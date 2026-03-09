@@ -9,7 +9,8 @@ const env = require('../../config/env');
 
 test.describe('Product Negative @regression', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     const dashboard = new DashboardPage(page);
     await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
     await dashboard.switchMerchant(env.merchantId);

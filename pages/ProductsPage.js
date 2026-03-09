@@ -48,6 +48,7 @@ class ProductsPage {
   }
 
   async updateProduct(updates) {
+    await this.titleInput.waitFor({ state: 'visible', timeout: 25000 });
     if (updates.name != null) await this.titleInput.fill(updates.name);
     if (updates.description != null) await this.descriptionEditor.fill(updates.description);
     await this.saveButton.click();
