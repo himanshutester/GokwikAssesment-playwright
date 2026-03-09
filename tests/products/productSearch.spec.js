@@ -16,8 +16,8 @@ test.describe('Product Search @regression', () => {
     const product = createProductData('Search');
 
     await page.goto('/', { waitUntil: 'load' });
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
-    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 45000 });
 
     await dashboard.switchMerchant(env.merchantId);
     await dashboard.navigateToProducts(env.merchantId);
@@ -25,12 +25,13 @@ test.describe('Product Search @regression', () => {
     await products.createProduct(product);
 
     await dashboard.navigateToProducts(env.merchantId);
-    await products.searchInput.waitFor({ state: 'visible', timeout: 20000 });
+    await products.searchInput.waitFor({ state: 'visible', timeout: 15000 });
 
     await products.searchProduct(product.name);
-    await page.waitForLoadState('networkidle').catch(() => {});
+    // Wait for row to appear (search is async; list can take time to update)
+    await products.getProductRow(product.name).waitFor({ state: 'visible', timeout: 40000 });
 
-    await expect(products.getProductRow(product.name)).toBeVisible({ timeout: 25000 });
+    await expect(products.getProductRow(product.name)).toBeVisible();
     await expect(products.getProductRow(product.name)).toHaveCount(1);
 
     const rows = page.locator('tbody tr');

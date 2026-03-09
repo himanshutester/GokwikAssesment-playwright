@@ -10,9 +10,9 @@ const env = require('../../config/env');
 test.describe('Pagination @regression', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'load' });
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     const dashboard = new DashboardPage(page);
-    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
+    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 45000 });
     await dashboard.switchMerchant(env.merchantId);
     await dashboard.navigateToProducts(env.merchantId);
   });

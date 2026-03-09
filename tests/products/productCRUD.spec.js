@@ -13,8 +13,8 @@ const { waitForProductCreate } = require('../../utils/apiHelper');
 test.describe('Product CRUD @smoke', () => {
   test('@smoke verify dashboard loads with saved session', async ({ page }) => {
     await page.goto('/', { waitUntil: 'load' });
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
-    await expect(page.getByRole('button', { name: 'qa.gokwik down' })).toBeVisible({ timeout: 60000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await expect(page.getByRole('button', { name: 'qa.gokwik down' })).toBeVisible({ timeout: 45000 });
   });
 
   test('Complete Product CRUD Flow @crud', async ({ page }) => {
@@ -22,8 +22,8 @@ test.describe('Product CRUD @smoke', () => {
     const products = new ProductsPage(page);
 
     await page.goto('/', { waitUntil: 'load' });
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
-    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 60000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await dashboard.merchantDropdown.waitFor({ state: 'visible', timeout: 45000 });
 
     await dashboard.switchMerchant(env.merchantId);
     await dashboard.navigateToProducts(env.merchantId);
@@ -36,11 +36,12 @@ test.describe('Product CRUD @smoke', () => {
     if (createResponse) expect(createResponse.ok()).toBeTruthy();
 
     await dashboard.navigateToProducts(env.merchantId);
-    await products.searchInput.waitFor({ state: 'visible', timeout: 20000 });
+    await products.searchInput.waitFor({ state: 'visible', timeout: 15000 });
     await products.searchProduct(product.name);
-    await page.waitForLoadState('networkidle').catch(() => {});
+    // Wait for row to appear (search can be async; allow time for list to update)
+    await products.getProductRow(product.name).waitFor({ state: 'visible', timeout: 40000 });
 
-    await expect(products.getProductRow(product.name)).toBeVisible({ timeout: 25000 });
+    await expect(products.getProductRow(product.name)).toBeVisible();
 
     await products.openProduct(product.name);
 
@@ -51,10 +52,9 @@ test.describe('Product CRUD @smoke', () => {
     await products.deleteProduct();
 
     await dashboard.navigateToProducts(env.merchantId);
-    await products.searchInput.waitFor({ state: 'visible', timeout: 20000 });
+    await products.searchInput.waitFor({ state: 'visible', timeout: 15000 });
     await products.searchProduct(updatedName);
-    await page.waitForLoadState('networkidle').catch(() => {});
-
-    await expect(products.getProductRow(updatedName)).toHaveCount(0);
+    // Wait for list to update; deleted product should disappear
+    await expect(products.getProductRow(updatedName)).toHaveCount(0, { timeout: 35000 });
   });
 });
