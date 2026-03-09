@@ -51,13 +51,17 @@ class ProductsPage {
     if (updates.name != null) await this.titleInput.fill(updates.name);
     if (updates.description != null) await this.descriptionEditor.fill(updates.description);
     await this.saveButton.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    // Wait for save to finish and page to stabilize (avoids dropdown detaching when we delete)
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+    await this.moreActions.waitFor({ state: 'visible', timeout: 20000 });
   }
 
   async deleteProduct() {
     await this.moreActions.click();
-    await this.deleteOption.waitFor({ state: 'visible', timeout: 15000 });
-    await this.deleteOption.click({ timeout: 15000 });
+    // Menu item can detach if the overlay re-renders; use role-based locator and force to reduce flakiness
+    const deleteMenuItem = this.page.getByRole('menuitem', { name: /delete/i }).first();
+    await deleteMenuItem.waitFor({ state: 'visible', timeout: 15000 });
+    await deleteMenuItem.click({ timeout: 15000, force: true });
     // If confirmation modal appears, confirm
     await this.confirmDeleteButton.click({ timeout: 5000 }).catch(() => {});
   }

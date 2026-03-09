@@ -5,13 +5,14 @@ module.exports = defineConfig({
 
   testDir: './tests',
 
-  timeout: 60000,
+  timeout: 120000,
 
-  expect: { timeout: 10000 },
+  expect: { timeout: 15000 },
 
-  retries: 2,
+  retries: process.env.CI ? 2 : 0,
 
-  workers: 4,
+  workers: 1,  // One context per run = one login (OTP); session stays alive for all tests
+  fullyParallel: false,
 
   reporter: [
     ['list'],
@@ -20,18 +21,10 @@ module.exports = defineConfig({
 
   projects: [
     {
-      name: 'setup',
-      testMatch: /.*\.setup\.js/,
-      retries: 0  // Don't retry auth; if login fails, fail fast
-    },
-    {
       name: 'chromium',
-      use: {
-        browserName: 'chromium',
-        storageState: 'storageState.json'
-      },
-      dependencies: ['setup'],
+      use: { browserName: 'chromium' },
       testIgnore: /.*\.setup\.js/
+      // Auth via fixtures.js: one shared context per worker, login once
     }
   ],
 

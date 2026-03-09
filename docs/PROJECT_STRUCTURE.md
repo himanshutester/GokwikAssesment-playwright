@@ -13,6 +13,7 @@ crm-playwright-framework/
 │   ├── auth.setup.js               # Runs first: login, save storageState
 │   └── products/
 │       ├── productCRUD.spec.js     # Full CRUD + dashboard check
+│       ├── productSearch.spec.js   # Search product by name
 │       ├── productNegative.spec.js # Create without title → validation
 │       └── pagination.spec.js      # Next page + controls
 │
